@@ -20,11 +20,11 @@ func NewHandler() *handler {
 // API
 
 func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
-
 	fmt.Fprintf(w, "Balance")
 }
 
+//TODO поменять get на post
 func (handler *handler) InitRoutes() *chi.Mux {
-	handler.router.Post("/balance", handler.getBalance)
+	handler.router.Get("/balance", handler.getBalance)
 	return handler.router
 }
