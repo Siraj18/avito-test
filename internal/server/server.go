@@ -14,13 +14,13 @@ type server struct {
 	server *http.Server
 }
 
-func NewServer(addr string, handler http.Handler) *server {
+func NewServer(addr string, handler http.Handler, timeouts time.Duration) *server {
 	return &server{
 		&http.Server{
 			Addr:         addr,
 			Handler:      handler,
-			ReadTimeout:  time.Second * 10,
-			WriteTimeout: time.Second * 10,
+			ReadTimeout:  timeouts,
+			WriteTimeout: timeouts,
 		},
 	}
 }
