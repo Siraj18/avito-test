@@ -2,19 +2,16 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/siraj18/avito-test/internal/handlers"
+	"github.com/siraj18/avito-test/internal/server"
 )
 
 func main() {
 
-	server := &http.Server{
-		Addr:    ":8000",
-		Handler: handlers.NewHandler().InitRoutes(),
-	}
-
-	err := server.ListenAndServe()
+	handler := handlers.NewHandler()
+	server := server.NewServer(":8000", handler.InitRoutes())
+	err := server.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
