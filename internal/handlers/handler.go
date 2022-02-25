@@ -9,14 +9,22 @@ import (
 )
 
 type handler struct {
-	router *chi.Mux
-	logger *logrus.Logger
+	router     *chi.Mux
+	logger     *logrus.Logger
+	repository Repository
 }
 
-func NewHandler() *handler {
+type Repository interface {
+	GetBalance(string)
+	ChangeBalance(string, float64)
+	TransferBalance(string, string, float64)
+}
+
+func NewHandler(rep Repository) *handler {
 	return &handler{
-		router: chi.NewRouter(),
-		logger: logrus.New(),
+		router:     chi.NewRouter(),
+		logger:     logrus.New(),
+		repository: rep,
 	}
 }
 
