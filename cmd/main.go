@@ -18,7 +18,11 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	rep := postgresdb.NewSqlRepository(db)
+	rep, err := postgresdb.NewSqlRepository(db)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
 	handler := handlers.NewHandler(rep)
 
 	server := server.NewServer(":8000", handler.InitRoutes(), time.Second*10)
