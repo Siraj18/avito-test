@@ -15,7 +15,7 @@ const initSchema = `
 					to_id      UUID REFERENCES users(id),
 					from_id    UUID REFERENCES users(id),
 					money      DECIMAL(10, 2) NOT NULL,
-					method 	   TEXT NOT NULL,
+					type 	   TEXT NOT NULL,
 					created_at TIMESTAMP DEFAULT now()
 				);
 				CREATE INDEX ON transactions (to_id);
