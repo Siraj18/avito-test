@@ -5,15 +5,18 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/sirupsen/logrus"
 )
 
 type handler struct {
 	router *chi.Mux
+	logger *logrus.Logger
 }
 
 func NewHandler() *handler {
 	return &handler{
 		router: chi.NewRouter(),
+		logger: logrus.New(),
 	}
 }
 
