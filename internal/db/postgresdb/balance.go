@@ -3,11 +3,13 @@ package postgresdb
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/siraj18/avito-test/internal/models"
 )
 
 var ErrorUserNotFound = fmt.Errorf("user not found")
+var ErrorNotEnoughMoney = fmt.Errorf("not enough money")
 
 const (
 	operationAddMoney      = "adding money"
@@ -43,7 +45,7 @@ func (rep *SqlRepository) ChangeBalance(uid string, money float64) (*models.User
 
 	var user models.User
 
-	if err := tx.QueryRow(getUserSql).Scan(&user.Id); err != nil {
+	if err := tx.QueryRow(getUserSql, uid).Scan(&user.Id); err != nil {
 		if err == sql.ErrNoRows {
 			err = rep.createUserBalance(uid, tx)
 			if err != nil {
@@ -54,10 +56,12 @@ func (rep *SqlRepository) ChangeBalance(uid string, money float64) (*models.User
 			return nil, err
 		}
 	}
-
 	row := tx.QueryRow(updateUserBalanceSql, uid, money)
 	if err = row.Scan(&user.Id, &user.Balance); err != nil {
 		//TODO проверка ошибок
+		if strings.Contains(err.Error(), "users_balance_check") {
+			return nil, ErrorNotEnoughMoney
+		}
 		return nil, err
 	}
 

@@ -33,6 +33,7 @@ func NewHandler(rep Repository) *handler {
 
 // API
 //TODO сдлетаь более нормальную обработку ошибок
+//TODO сделать конвертацию валют
 func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	var postData models.UserGetBalanceQuery
 
@@ -53,7 +54,28 @@ func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+func (handler *handler) changeBalance(w http.ResponseWriter, r *http.Request) {
+	var postData models.UserChangeBalanceQuery
+
+	err := json.NewDecoder(r.Body).Decode(&postData)
+	if err != nil {
+		http.Error(w, "invalid post data", http.StatusBadRequest)
+		return
+	}
+
+	user, err := handler.repository.ChangeBalance(postData.Id, postData.Money)
+	if err != nil {
+		if err == postgresdb.ErrorNotEnoughMoney {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(500)
+	}
+	json.NewEncoder(w).Encode(user)
+}
+
 func (handler *handler) InitRoutes() *chi.Mux {
 	handler.router.Post("/balance", handler.getBalance)
+	handler.router.Post("/changeBalance", handler.changeBalance)
 	return handler.router
 }

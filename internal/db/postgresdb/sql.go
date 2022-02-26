@@ -7,7 +7,7 @@ const initSchema = `
 				CREATE TABLE IF NOT EXISTS users 
 				(
 					id  	UUID PRIMARY KEY,
-					balance DECIMAL(10, 2) DEFAULT 0
+					balance DECIMAL(10, 2) DEFAULT 0 CHECK (balance >= 0)
 				);
 				CREATE TABLE IF NOT EXISTS transactions
 				(
@@ -28,7 +28,8 @@ const addUserSql = `
 
 const updateUserBalanceSql = `
 				UPDATE users SET balance=balance + $2
-				WHERE id=$1;	
+				WHERE id=$1
+				RETURNING *;
 `
 
 const getUserBalanceSql = `
