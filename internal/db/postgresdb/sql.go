@@ -15,7 +15,7 @@ const initSchema = `
 					to_id      UUID REFERENCES users(id),
 					from_id    UUID REFERENCES users(id),
 					money      DECIMAL(10, 2) NOT NULL,
-					type 	   TEXT NOT NULL,
+					operation  TEXT NOT NULL,
 					created_at TIMESTAMP DEFAULT now()
 				);
 				CREATE INDEX ON transactions (to_id);
@@ -34,4 +34,14 @@ const updateUserBalanceSql = `
 const getUserBalanceSql = `
 				SELECT id, balance FROM users
 				WHERE id=$1;
+`
+
+const getUserSql = `
+				SELECT id FROM users
+				WHERE id=$1;
+`
+
+const addTransactionsSql = `
+				INSERT INTO transactions (to_id, from_id, money, operation)
+				VALUES ($1, $2, $3, $4);
 `

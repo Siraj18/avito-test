@@ -19,7 +19,7 @@ type handler struct {
 
 type Repository interface {
 	GetBalance(string) (*models.User, error)
-	ChangeBalance(string, float64)
+	ChangeBalance(string, float64) (*models.User, error)
 	TransferBalance(string, string, float64)
 }
 
@@ -32,7 +32,7 @@ func NewHandler(rep Repository) *handler {
 }
 
 // API
-
+//TODO сдлетаь более нормальную обработку ошибок
 func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	var postData models.UserGetBalanceQuery
 
