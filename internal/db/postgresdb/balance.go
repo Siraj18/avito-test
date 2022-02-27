@@ -90,7 +90,8 @@ func (rep *SqlRepository) TransferBalance(fromUid string, toUid string, money fl
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec(updateUserBalanceSql, toUid, money)
+	var empty interface{}
+	err = tx.QueryRow(updateUserBalanceSql, toUid, money).Scan(&empty, &empty)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ErrorUserNotFound
@@ -99,7 +100,7 @@ func (rep *SqlRepository) TransferBalance(fromUid string, toUid string, money fl
 		return err
 	}
 
-	_, err = tx.Exec(updateUserBalanceSql, fromUid, -money)
+	err = tx.QueryRow(updateUserBalanceSql, fromUid, -money).Scan(&empty, &empty)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return ErrorUserNotFound
