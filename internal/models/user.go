@@ -13,3 +13,9 @@ type UserChangeBalanceQuery struct {
 	Id    string  `json:"id"`
 	Money float64 `json:"money"`
 }
+
+type UserTransferBalanceQuery struct {
+	FromId string  `json:"from_id"`
+	ToId   string  `json:"to_id"`
+	Money  float64 `json:"money"`
+}
