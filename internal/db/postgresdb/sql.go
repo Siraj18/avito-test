@@ -46,3 +46,16 @@ const addTransactionsSql = `
 				INSERT INTO transactions (to_id, from_id, money, operation)
 				VALUES ($1, $2, $3, $4);
 `
+
+const getTransactionSql = `
+				SELECT id, to_id, from_id, money, operation, created_at FROM transactions
+				WHERE id=$1;
+`
+
+const getAllTransactionsSql = `
+				SELECT id, to_id, from_id, money, operation, created_at FROM transactions
+				WHERE to_id=$1 OR from_id=$1
+				%s
+				LIMIT $2
+				OFFSET $3;
+`
