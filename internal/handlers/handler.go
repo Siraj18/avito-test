@@ -20,7 +20,7 @@ type handler struct {
 type Repository interface {
 	GetBalance(string) (*models.User, error)
 	ChangeBalance(string, float64) (*models.User, error)
-	TransferBalance(string, string, float64)
+	TransferBalance(string, string, float64) error
 }
 
 func NewHandler(rep Repository) *handler {

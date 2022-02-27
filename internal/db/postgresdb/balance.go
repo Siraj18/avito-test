@@ -14,6 +14,7 @@ var ErrorNotEnoughMoney = fmt.Errorf("not enough money")
 const (
 	operationAddMoney      = "adding money"
 	operationWithdrawMoney = "withdrawal of money"
+	operationTransferMoney = "transfer money"
 )
 
 func (rep *SqlRepository) createUserBalance(uid string, tx *sql.Tx) error {
@@ -82,6 +83,40 @@ func (rep *SqlRepository) ChangeBalance(uid string, money float64) (*models.User
 	return &user, nil
 }
 
-func (rep *SqlRepository) TransferBalance(fromUid string, toUid string, money float64) {
+func (rep *SqlRepository) TransferBalance(fromUid string, toUid string, money float64) error {
+	tx, err := rep.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 
+	_, err = tx.Exec(updateUserBalanceSql, toUid, money)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ErrorUserNotFound
+		}
+
+		return err
+	}
+
+	_, err = tx.Exec(updateUserBalanceSql, fromUid, -money)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return ErrorUserNotFound
+		} else if strings.Contains(err.Error(), "users_balance_check") {
+			return ErrorNotEnoughMoney
+		}
+
+		return err
+	}
+
+	if err = rep.addTransaction(&toUid, &fromUid, operationTransferMoney, money, tx); err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
 }
