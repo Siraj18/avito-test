@@ -3,12 +3,15 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/siraj18/avito-test/internal/currency"
 	"github.com/siraj18/avito-test/internal/db/postgresdb"
 	"github.com/siraj18/avito-test/internal/models"
+	"github.com/siraj18/avito-test/pkg/currencyapi"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,12 +35,11 @@ func NewHandler(rep Repository, currency *currency.Currency) *handler {
 		router:     chi.NewRouter(),
 		logger:     logrus.New(),
 		repository: rep,
+		currency:   currency,
 	}
 }
 
 // API
-//TODO сдлетаь более нормальную обработку ошибок
-//TODO сделать конвертацию валют
 func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	var postData models.UserGetBalanceQuery
 
@@ -49,13 +51,60 @@ func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := handler.repository.GetBalance(postData.Id)
+	currency := r.URL.Query().Get("currency")
 
-	if err == postgresdb.ErrorUserNotFound {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
+	var user *models.User
+	
+	errs := make(chan error, 2)
+	wgDone := make(chan bool)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		user, err = handler.repository.GetBalance(postData.Id)
+		if err != nil {
+			errs <- err
+			return
+		}
+		wg.Done()
+	}()
+
+	var rate float64
+
+	go func() {
+		rate, err = handler.currency.GetCurrency(currency)
+		if err != nil {
+			errs <- err
+			return
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	select {
+	case res := <-errs:
+		switch res {
+		case postgresdb.ErrorUserNotFound:
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		case currencyapi.ErrorWrongCurrency:
+			http.Error(w, err.Error(), http.StatusOK)
+			return
+		default:
+			w.WriteHeader(500)
+			handler.logger.Error(err)
+			return
+		}
+	case <-wgDone:
+		break
 	}
-	fmt.Println(err)
+
+	user.Balance = math.Round((user.Balance/rate)*100) / 100
 
 	json.NewEncoder(w).Encode(user)
 }

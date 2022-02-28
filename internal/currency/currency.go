@@ -26,6 +26,7 @@ func NewCurrency(rdb *redis.Client, apiToken string, lifeTime time.Duration) *Cu
 func (cur *Currency) GetCurrency(currency string) (float64, error) {
 
 	value, err := cur.rdb.Get(context.Background(), currency).Result()
+
 	if err != nil {
 		if err == redis.Nil {
 			rate, err := currencyapi.GetCurrencyRate("RUB", currency, cur.apiToken)
