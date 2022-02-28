@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 var ErrorWrongCurrency = fmt.Errorf("wrong currency")
@@ -25,6 +26,8 @@ func GetCurrencyRate(basicCurrency, currency, apiToken string) (float64, error) 
 	}
 
 	defer resp.Body.Close()
+
+	currency = strings.ToUpper(currency)
 
 	rate, ok := body.Rates[currency]
 	if !ok {

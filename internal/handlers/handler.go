@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/siraj18/avito-test/internal/currency"
 	"github.com/siraj18/avito-test/internal/db/postgresdb"
 	"github.com/siraj18/avito-test/internal/models"
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ type handler struct {
 	router     *chi.Mux
 	logger     *logrus.Logger
 	repository Repository
+	currency   *currency.Currency
 }
 
 type Repository interface {
@@ -25,7 +27,7 @@ type Repository interface {
 	GetAllTransactions(string, string, int, int) (*[]models.Transaction, error)
 }
 
-func NewHandler(rep Repository) *handler {
+func NewHandler(rep Repository, currency *currency.Currency) *handler {
 	return &handler{
 		router:     chi.NewRouter(),
 		logger:     logrus.New(),
