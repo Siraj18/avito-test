@@ -12,6 +12,7 @@ import (
 
 func main() {
 	// docker run --name some-postgres -p 5433:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:14.2-alpine
+	// 05802b752dcc15626f922580104bad3a - TOKEN
 	conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
 	db, err := postgres.NewDb(conStr)
 	if err != nil {
