@@ -8,5 +8,3 @@ RUN go mod download && go mod verify
 COPY . .
 
 RUN go build -o server ./cmd
-
-CMD ["/app/server"]

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/siraj18/avito-test/internal/currency"
@@ -16,7 +18,13 @@ func main() {
 	// docker run --name some-postgres -p 5433:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:14.2-alpine
 	// docker run --name some-redis -p 6379:6379 -d redis:alpine
 	// 05802b752dcc15626f922580104bad3a - TOKEN
-	conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
+	//conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
+	conStr := os.Getenv("connection_string_postgres")
+	redisConStr := os.Getenv("connection_string_redis")
+	apiToken := os.Getenv("api_token")
+	address := os.Getenv("address")
+
+	fmt.Println(conStr)
 	db, err := postgres.NewDb(conStr)
 	if err != nil {
 		logrus.Fatal(err)
@@ -27,16 +35,16 @@ func main() {
 		logrus.Fatal(err)
 	}
 
-	rdb, err := rediscache.NewRedis("localhost:6379", "", 0)
+	rdb, err := rediscache.NewRedis(redisConStr, "", 0)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	cr := currency.NewCurrency(rdb, "05802b752dcc15626f922580104bad3a", 10*time.Minute)
+	cr := currency.NewCurrency(rdb, apiToken, 10*time.Minute)
 
 	handler := handlers.NewHandler(rep, cr)
 
-	server := server.NewServer(":8000", handler.InitRoutes(), time.Second*10)
+	server := server.NewServer(address, handler.InitRoutes(), time.Second*10)
 	if err := server.Run(); err != nil {
 		logrus.Fatal(err)
 	}

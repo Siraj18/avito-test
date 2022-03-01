@@ -54,7 +54,7 @@ func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	currency := r.URL.Query().Get("currency")
 
 	var user *models.User
-	
+
 	errs := make(chan error, 2)
 	wgDone := make(chan bool)
 
@@ -73,6 +73,9 @@ func (handler *handler) getBalance(w http.ResponseWriter, r *http.Request) {
 	var rate float64
 
 	go func() {
+		if currency == "" {
+			currency = "RUB"
+		}
 		rate, err = handler.currency.GetCurrency(currency)
 		if err != nil {
 			errs <- err

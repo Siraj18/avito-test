@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    command: "/app/server"
+    environment:
+      - connection_string_postgres=postgres://postgres:mysecretpassword@db:5432/postgres?sslmode=disable
+      - api_token=05802b752dcc15626f922580104bad3a
+      - connection_string_redis=redis:6379
+      - address=:8000
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+
+  db:
+    container_name: db
+    image: postgres:14.2-alpine
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379

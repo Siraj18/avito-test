@@ -1,27 +1,34 @@
 package postgres
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
+//TODO рефакторинг
 func NewDb(conStr string) (*sqlx.DB, error) {
-	db, err := sqlx.Connect("pgx", conStr)
+	var err error
+	var db *sqlx.DB
 
+	for i := 0; i < 10; i++ {
+		db, err = sqlx.Connect("pgx", conStr)
+		if err != nil {
+			logrus.Error("unable to connect db:%w", err)
+			time.Sleep(time.Second * 2)
+		} else if err = db.Ping(); err != nil {
+			logrus.Error("an error occurred when ping database: %w", err)
+			time.Sleep(time.Second * 2)
+		} else {
+			err = nil
+			break
+		}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to the database: %w", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	defer cancel()
-
-	err = db.PingContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("an error occurred when ping database: %w", err)
 	}
 
 	return db, nil
