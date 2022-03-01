@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/siraj18/avito-test/internal/currency"
 	"github.com/siraj18/avito-test/internal/db/postgresdb"
 	"github.com/siraj18/avito-test/internal/models"
 	"github.com/siraj18/avito-test/pkg/currencyapi"
@@ -19,7 +18,7 @@ type handler struct {
 	router     *chi.Mux
 	logger     *logrus.Logger
 	repository Repository
-	currency   *currency.Currency
+	currency   Currency
 }
 
 type Repository interface {
@@ -29,8 +28,11 @@ type Repository interface {
 	GetTransaction(string) (*models.Transaction, error)
 	GetAllTransactions(string, string, int, int) (*[]models.Transaction, error)
 }
+type Currency interface {
+	GetCurrency(currency string) (float64, error)
+}
 
-func NewHandler(rep Repository, currency *currency.Currency) *handler {
+func NewHandler(rep Repository, currency Currency) *handler {
 	return &handler{
 		router:     chi.NewRouter(),
 		logger:     logrus.New(),

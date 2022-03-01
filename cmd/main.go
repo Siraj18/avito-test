@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/siraj18/avito-test/internal/currency"
@@ -18,14 +17,17 @@ func main() {
 	// docker run --name some-postgres -p 5433:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:14.2-alpine
 	// docker run --name some-redis -p 6379:6379 -d redis:alpine
 	// 05802b752dcc15626f922580104bad3a - TOKEN
-	//conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
-	conStr := os.Getenv("connection_string_postgres")
-	redisConStr := os.Getenv("connection_string_redis")
-	apiToken := os.Getenv("api_token")
-	address := os.Getenv("address")
+	conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
+	redisConStr := "localhost:6379"
+	apiToken := "05802b752dcc15626f922580104bad3a"
+	address := ":8000"
+	// conStr := os.Getenv("connection_string_postgres")
+	// redisConStr := os.Getenv("connection_string_redis")
+	// apiToken := os.Getenv("api_token")
+	// address := os.Getenv("address")
 
 	fmt.Println(conStr)
-	db, err := postgres.NewDb(conStr)
+	db, err := postgres.NewDb(conStr, 10)
 	if err != nil {
 		logrus.Fatal(err)
 	}

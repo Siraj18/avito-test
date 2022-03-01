@@ -10,11 +10,11 @@ import (
 )
 
 //TODO рефакторинг
-func NewDb(conStr string) (*sqlx.DB, error) {
+func NewDb(conStr string, retries int) (*sqlx.DB, error) {
 	var err error
 	var db *sqlx.DB
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < retries; i++ {
 		db, err = sqlx.Connect("pgx", conStr)
 		if err != nil {
 			logrus.Error("unable to connect db:%w", err)
