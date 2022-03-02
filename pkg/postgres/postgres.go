@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//TODO рефакторинг
 func NewDb(conStr string, retries int) (*sqlx.DB, error) {
 	var err error
 	var db *sqlx.DB

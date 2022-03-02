@@ -14,13 +14,6 @@ import (
 )
 
 func main() {
-	// docker run --name some-postgres -p 5433:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres:14.2-alpine
-	// docker run --name some-redis -p 6379:6379 -d redis:alpine
-	// 05802b752dcc15626f922580104bad3a - TOKEN
-	// conStr := "postgresql://postgres:mysecretpassword@localhost:5433/postgres?sslmode=disable"
-	// redisConStr := "localhost:6379"
-	// apiToken := "05802b752dcc15626f922580104bad3a"
-	// address := ":8000"
 	conStr := os.Getenv("connection_string_postgres")
 	redisConStr := os.Getenv("connection_string_redis")
 	apiToken := os.Getenv("api_token")
