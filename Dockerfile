@@ -7,4 +7,4 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o server ./cmd
+RUN go build -o server ./cmd/billingapp

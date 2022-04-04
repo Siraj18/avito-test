@@ -23,6 +23,7 @@ func (rep *SqlRepository) GetTransaction(id string) (*models.Transaction, error)
 		if err == sql.ErrNoRows {
 			return nil, ErrorTransactionNotFound
 		}
+
 		return nil, err
 	}
 
