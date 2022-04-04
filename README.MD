@@ -20,6 +20,11 @@ docker-compose up -d
 docker-compose down
 ```
 
+#### Или же выполните следующую make команду:
+```
+make run_service
+```
+
 
 ### Запросы и примеры ответов
 Все запросы собраны в коллекции Postman. Доступ к коллекции можно получить по [ссылке](https://www.getpostman.com/collections/7e29a2b327292090f9b5 "Ссылка на postman коллекцию")   
